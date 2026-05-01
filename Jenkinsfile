@@ -81,7 +81,7 @@ pipeline {
                         
                         git config user.email "jenkins@demystops.com"
                         git config user.name "Jenkins CI"
-                        git add k8s/deployment.yaml
+                        git add k8s/
                         git commit -m "release: version ${env.APP_VERSION} [skip ci]" || echo "No changes"
                         git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN_DEMYSTOPS}@github.com/${GITHUB_USERNAME}/demystops.git main
                     """
