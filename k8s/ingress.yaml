@@ -9,8 +9,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: demystops.com
-    http:
+  - http: # On retire la ligne host pour accepter toutes les requêtes
       paths:
       - path: /
         pathType: Prefix
