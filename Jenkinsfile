@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        GITHUB_USERNAME = 'SalifAbdoulSow18'
+        GITHUB_USERNAME = 'fallou44'
         DOCKER_HUB_USERNAME = 'sasow'
         DOCKER_HUB_REPO = 'demyst-ops'
         IMAGE_NAME = "${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPO}"
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 git branch: 'main', 
                     url: 'https://github.com/fallou44/demystops.git',
-                    credentialsId: 'github-credentials'
+                    credentialsId: 'github-credentials-demystops'
             }
         }
         
@@ -74,7 +74,7 @@ pipeline {
         
         stage('Update Git Manifests') {
             steps {
-                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN')]) {
                     sh """
                         # Mettre à jour l'image dans deployment.yaml
                         sed -i "s|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${env.APP_VERSION}|" k8s/deployment.yaml
@@ -91,7 +91,7 @@ pipeline {
         
         stage('Create GitHub Release') {
             steps {
-                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN')]) {
                     sh """
                         git tag -a ${env.APP_VERSION} -m "Release ${env.APP_VERSION}" || true
                         git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/demystops.git ${env.APP_VERSION} || true
@@ -114,7 +114,7 @@ pipeline {
                 writeFile(file: 'VERSION', text: newVersion)
                 
                 // Commit et push de la nouvelle version
-                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN')]) {
                     sh """
                         git config user.email "jenkins@immoapp.com"
                         git config user.name "Jenkins CI"
