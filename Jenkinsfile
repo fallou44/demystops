@@ -74,7 +74,7 @@ pipeline {
         
         stage('Update Git Manifests') {
             steps {
-                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN_DEMYSTOPS')]) {
                     sh """
                         # Mettre à jour l'image dans deployment.yaml
                         sed -i "s|image: ${IMAGE_NAME}:.*|image: ${IMAGE_NAME}:${env.APP_VERSION}|" k8s/deployment.yaml
@@ -83,7 +83,7 @@ pipeline {
                         git config user.name "Jenkins CI"
                         git add k8s/deployment.yaml
                         git commit -m "release: version ${env.APP_VERSION} [skip ci]" || echo "No changes"
-                        git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/demystops.git main
+                        git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN_DEMYSTOPS}@github.com/${GITHUB_USERNAME}/demystops.git main
                     """
                 }
             }
@@ -91,10 +91,10 @@ pipeline {
         
         stage('Create GitHub Release') {
             steps {
-                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN_DEMYSTOPS')]) {
                     sh """
                         git tag -a ${env.APP_VERSION} -m "Release ${env.APP_VERSION}" || true
-                        git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/demystops.git ${env.APP_VERSION} || true
+                        git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN_DEMYSTOPS}@github.com/${GITHUB_USERNAME}/demystops.git ${env.APP_VERSION} || true
                     """
                 }
             }
@@ -114,13 +114,13 @@ pipeline {
                 writeFile(file: 'VERSION', text: newVersion)
                 
                 // Commit et push de la nouvelle version
-                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github-token-demystops', variable: 'GITHUB_TOKEN_DEMYSTOPS')]) {
                     sh """
                         git config user.email "jenkins@immoapp.com"
                         git config user.name "Jenkins CI"
                         git add VERSION
                         git commit -m "chore: bump version to ${newVersion} [skip ci]"
-                        git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/demystops.git main
+                        git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN_DEMYSTOPS}@github.com/${GITHUB_USERNAME}/demystops.git main
                     """
                 }
                 
