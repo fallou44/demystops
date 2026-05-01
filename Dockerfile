@@ -21,6 +21,9 @@ FROM node:20-alpine AS runner
 # Install nginx and other tools
 RUN apk add --no-cache nginx
 
+# Fix for Nginx on Alpine (ensure run directory exists)
+RUN mkdir -p /run/nginx
+
 WORKDIR /app
 
 # Set environment to production
