@@ -4,9 +4,9 @@ pipeline {
     environment {
         GITHUB_USERNAME = 'fallou44'
         DOCKER_HUB_USERNAME = 'sasow'
-        DOCKER_HUB_REPO = 'demyst-ops'
+        DOCKER_HUB_REPO = 'demystops'
         IMAGE_NAME = "${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPO}"
-        K8S_NAMESPACE = 'demyst-ops'
+        K8S_NAMESPACE = 'demystops'
     }
     
     stages {

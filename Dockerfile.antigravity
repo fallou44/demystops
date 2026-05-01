@@ -1,0 +1,48 @@
+# Use Node.js 20 Alpine as base
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies first (for better caching)
+COPY package*.json ./
+RUN npm install
+
+# Copy Prisma schema and generate client
+COPY prisma ./prisma/
+RUN npx prisma generate
+
+# Copy the rest of the application
+COPY . .
+
+# Build the frontend
+RUN npm run build
+
+# --- Production Stage ---
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Set environment to production
+ENV NODE_ENV=production
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+# Note: we need tsx and typescript to run server.ts if not compiled
+RUN npm install --omit=dev && npm install -g tsx typescript
+
+# Copy the built frontend
+COPY --from=builder /app/dist ./dist
+
+# Copy the server and backend source code
+# Since the server runs via tsx, it needs the source files
+COPY --from=builder /app/server.ts ./
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/prisma ./prisma
+
+# Expose the application port
+EXPOSE 3000
+
+# Start the application
+CMD ["tsx", "server.ts"]
