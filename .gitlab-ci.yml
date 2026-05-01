@@ -1,0 +1,37 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
+
+test:
+  stage: test
+  image: node:20
+  script:
+    - npm install
+    - npx prisma generate
+    - npm run lint
+    # - npm run test # Add tests if available
+
+deploy_production:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - echo "Deploying to production server..."
+    # Example for CapRover or similar
+    # - caprover deploy --imageName $DOCKER_IMAGE --appName demystops
+  only:
+    - main
+  when: manual

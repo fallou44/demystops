@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:./dev.db
+      - JWT_SECRET=dev_secret_key
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # In a real production environment, we would use a real PostgreSQL service
+  # db:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: demystops
+  #   ports:
+  #     - "5432:5432"
