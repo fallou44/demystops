@@ -1,9 +1,9 @@
-# Use Node.js 20 Alpine as base
+# Use Node.js 20 Alpine as build stage
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies first (for better caching)
+# Install dependencies
 COPY package*.json ./
 RUN npm install
 
@@ -11,38 +11,42 @@ RUN npm install
 COPY prisma ./prisma/
 RUN npx prisma generate
 
-# Copy the rest of the application
+# Copy the rest of the application and build
 COPY . .
-
-# Build the frontend
 RUN npm run build
 
 # --- Production Stage ---
 FROM node:20-alpine AS runner
+
+# Install nginx and other tools
+RUN apk add --no-cache nginx
 
 WORKDIR /app
 
 # Set environment to production
 ENV NODE_ENV=production
 
-# Copy package files
+# Copy package files and install production dependencies
 COPY package*.json ./
-
-# Install only production dependencies
-# Note: we need tsx and typescript to run server.ts if not compiled
 RUN npm install --omit=dev && npm install -g tsx typescript
 
-# Copy the built frontend
-COPY --from=builder /app/dist ./dist
+# Copy the built frontend to Nginx's directory
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy the server and backend source code
-# Since the server runs via tsx, it needs the source files
 COPY --from=builder /app/server.ts ./
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 
-# Expose the application port
-EXPOSE 3000
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Start the application
-CMD ["tsx", "server.ts"]
+# Copy and prepare the startup script
+COPY start.sh ./
+RUN chmod +x start.sh
+
+# Expose port 80 (Nginx) and 3000 (Node API)
+EXPOSE 80 3000
+
+# Start both services using the script
+CMD ["./start.sh"]
