@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: demystops
-        image: sasow/demystops:1.0.3
+        image: sasow/demystops:1.0.4
         imagePullPolicy: Always
         ports:
         - containerPort: 80
