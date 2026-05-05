@@ -21,7 +21,7 @@ spec:
         image: sasow/demystops:1.0.14
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 8081
         resources:
           requests:
             memory: "256Mi"
