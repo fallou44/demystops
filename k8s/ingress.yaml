@@ -3,7 +3,16 @@ kind: Ingress
 metadata:
   name: demystops-ingress
   namespace: demystops
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
+  tls:
+  - hosts:
+    - demystops.com
+    - www.demystops.com
+    secretName: demystops-tls
   rules:
   - host: demystops.com
     http:
