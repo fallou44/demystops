@@ -18,6 +18,12 @@ RUN npm run build
 # --- Production Stage ---
 FROM node:20-alpine AS runner
 
+# Install nginx and other tools
+RUN apk add --no-cache nginx
+
+# Fix for Nginx on Alpine (ensure run directory exists)
+RUN mkdir -p /run/nginx
+
 WORKDIR /app
 
 # Set environment to production
@@ -27,16 +33,23 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm install --omit=dev && npm install -g tsx typescript
 
-# Copy the built frontend to dist directory
-COPY --from=builder /app/dist ./dist
+# Copy the built frontend to Nginx's directory
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy the server and backend source code
 COPY --from=builder /app/server.ts ./
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 
-# Expose port 3000 (Node API and Frontend)
-EXPOSE 3000
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Start the application
-CMD ["tsx", "server.ts"]
+# Copy and prepare the startup script
+COPY start.sh ./
+RUN chmod +x start.sh
+
+# Expose port 80 (Nginx) and 3000 (Node API)
+EXPOSE 80 3000
+
+# Start both services using the script
+CMD ["./start.sh"]
