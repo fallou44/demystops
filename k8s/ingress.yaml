@@ -21,4 +21,4 @@ spec:
           service:
             name: demystops-service
             port:
-              number: 8081
+              number: 80
