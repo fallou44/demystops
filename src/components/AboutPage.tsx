@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import {
   Terminal,
@@ -10,10 +10,55 @@ import {
   Cpu,
   Linkedin,
   Mail,
-  MapPin
+  MapPin,
+  Loader2,
+  CheckCircle2
 } from 'lucide-react';
 
 export default function AboutPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Une erreur est survenue lors de l\'envoi du message.');
+      }
+
+      setStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setStatus('idle'), 5000);
+    } catch (error) {
+      console.error('Contact form error:', error);
+      setStatus('error');
+      setErrorMessage('Impossible d\'envoyer le message. Veuillez réessayer plus tard.');
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
   return (
     <div className="min-h-screen pt-32 pb-20 bg-[#050505]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -127,25 +172,81 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="bg-black/10 backdrop-blur-md p-8 rounded-3xl border border-white/10">
-              <form className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-white mb-2 uppercase tracking-widest">Nom</label>
-                    <input type="text" className="w-full bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-white transition-all" />
+              {status === 'success' ? (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="h-[400px] flex flex-col items-center justify-center text-center p-8"
+                >
+                  <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mb-6">
+                    <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Message envoyé !</h3>
+                  <p className="text-emerald-100/70">Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais.</p>
+                </motion.div>
+              ) : (
+                <form className="space-y-4" onSubmit={handleSubmit}>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-white mb-2 uppercase tracking-widest">Nom</label>
+                      <input 
+                        type="text" 
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        className="w-full bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-white transition-all placeholder:text-white/20" 
+                        placeholder="Votre nom"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-white mb-2 uppercase tracking-widest">Email</label>
+                      <input 
+                        type="email" 
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className="w-full bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-white transition-all placeholder:text-white/20" 
+                        placeholder="email@exemple.com"
+                      />
+                    </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-white mb-2 uppercase tracking-widest">Email</label>
-                    <input type="email" className="w-full bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-white transition-all" />
+                    <label className="block text-xs font-bold text-white mb-2 uppercase tracking-widest">Message</label>
+                    <textarea 
+                      name="message"
+                      rows={4} 
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-white transition-all placeholder:text-white/20"
+                      placeholder="Comment pouvons-nous vous aider ?"
+                    ></textarea>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-white mb-2 uppercase tracking-widest">Message</label>
-                  <textarea rows={4} className="w-full bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-white transition-all"></textarea>
-                </div>
-                <button className="w-full bg-white text-emerald-600 hover:bg-emerald-50 py-4 rounded-xl font-bold text-lg transition-all shadow-xl shadow-black/10">
-                  Envoyer le message
-                </button>
-              </form>
+                  
+                  {status === 'error' && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+                      {errorMessage}
+                    </div>
+                  )}
+
+                  <button 
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="w-full bg-white text-emerald-600 hover:bg-emerald-50 py-4 rounded-xl font-bold text-lg transition-all shadow-xl shadow-black/10 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Envoi en cours...
+                      </>
+                    ) : (
+                      'Envoyer le message'
+                    )}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </section>
