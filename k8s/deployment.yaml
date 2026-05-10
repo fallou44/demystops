@@ -22,6 +22,32 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 80
+        env:
+        - name: SMTP_HOST
+          valueFrom:
+            secretKeyRef:
+              name: demystops-secrets
+              key: SMTP_HOST
+        - name: SMTP_PORT
+          valueFrom:
+            secretKeyRef:
+              name: demystops-secrets
+              key: SMTP_PORT
+        - name: SMTP_USER
+          valueFrom:
+            secretKeyRef:
+              name: demystops-secrets
+              key: SMTP_USER
+        - name: SMTP_PASS
+          valueFrom:
+            secretKeyRef:
+              name: demystops-secrets
+              key: SMTP_PASS
+        - name: SMTP_SECURE
+          valueFrom:
+            secretKeyRef:
+              name: demystops-secrets
+              key: SMTP_SECURE
         resources:
           requests:
             memory: "256Mi"
