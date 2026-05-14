@@ -21,6 +21,8 @@ export class ContactService {
   async sendEmail(createContactDto: CreateContactDto) {
     console.log('--- Tentative d\'envoi d\'email ---');
     console.log('Host SMTP:', process.env.SMTP_HOST || 'smtp.gmail.com (DÉFAUT)');
+    console.log('Port SMTP:', process.env.SMTP_PORT || '587');
+    console.log('Secure SMTP:', process.env.SMTP_SECURE === 'true');
     console.log('User SMTP:', process.env.SMTP_USER || 'NON DÉFINI');
     
     const { name, email, message } = createContactDto;
@@ -41,7 +43,9 @@ export class ContactService {
     };
 
     try {
-      await this.transporter.sendMail(mailOptions);
+      console.log('Envoi en cours...');
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Email envoyé avec succès ! ID:', info.messageId);
       return { success: true, message: 'Email envoyé avec succès' };
     } catch (error) {
       console.error('Erreur lors de l\'envoi de l\'email:', error);
