@@ -15,6 +15,7 @@ RUN npx prisma generate
 COPY . .
 RUN npm run build
 RUN npx tsc -p tsconfig.build.json
+RUN echo '{"type": "commonjs"}' > dist-backend/package.json
 
 # --- Production Stage ---
 FROM node:20-alpine AS runner

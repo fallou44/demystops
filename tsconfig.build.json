@@ -3,8 +3,8 @@
   "compilerOptions": {
     "noEmit": false,
     "outDir": "dist-backend",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "CommonJS",
+    "moduleResolution": "Node10",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": false,
