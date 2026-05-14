@@ -26,7 +26,8 @@ export class ContactService {
     const { name, email, message } = createContactDto;
 
     const mailOptions = {
-      from: `"${name}" <${email}>`,
+      from: `"Formulaire de Contact" <contact@demystops.com>`,
+      replyTo: email,
       to: 'contact@demystops.com',
       subject: `Nouveau message de contact de ${name}`,
       text: message,
