@@ -40,6 +40,7 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 COPY --from=builder /app/server.ts ./
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/tsconfig.json ./
 
 # Copy Nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
