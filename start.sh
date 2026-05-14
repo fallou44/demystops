@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Start the Node.js backend in the background
-# We use ts-node-esm because it supports NestJS dependency injection (metadata)
-ts-node-esm server.ts &
+# We run the compiled JavaScript version for maximum stability and speed
+node dist-backend/server.js &
 
 # Start Nginx in the foreground
 nginx -g 'daemon off;'

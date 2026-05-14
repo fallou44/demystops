@@ -14,6 +14,7 @@ RUN npx prisma generate
 # Copy the rest of the application and build
 COPY . .
 RUN npm run build
+RUN npx tsc -p tsconfig.build.json
 
 # --- Production Stage ---
 FROM node:20-alpine AS runner
@@ -32,15 +33,15 @@ ENV NODE_ENV=production
 # Copy package files and install production dependencies
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm install --omit=dev && npm install -g ts-node typescript && npx prisma generate
+RUN npm install --omit=dev && npx prisma generate
 
 # Copy the built frontend to Nginx's directory
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy the server and backend source code
-COPY --from=builder /app/server.ts ./
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/tsconfig.json ./
+# Copy the built backend
+COPY --from=builder /app/dist-backend ./dist-backend
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
 
 # Copy Nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
