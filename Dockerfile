@@ -18,8 +18,8 @@ RUN npm run build
 # --- Production Stage ---
 FROM node:20-alpine AS runner
 
-# Install nginx and other tools
-RUN apk add --no-cache nginx
+# Install nginx and other tools (openssl and libc6-compat are required for Prisma)
+RUN apk add --no-cache nginx openssl libc6-compat
 
 # Fix for Nginx on Alpine (ensure run directory exists)
 RUN mkdir -p /run/nginx
