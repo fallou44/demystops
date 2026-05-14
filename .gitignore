@@ -7,3 +7,4 @@ coverage/
 .env*
 !.env.example
 k8s/secrets.yaml
+dist-backend/
