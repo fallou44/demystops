@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: demystops
-        image: sasow/demystops:1.0.38
+        image: sasow/demystops:1.0.39
         imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -55,3 +55,4 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "200m"
+EOF

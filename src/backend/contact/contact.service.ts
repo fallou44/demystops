@@ -19,6 +19,10 @@ export class ContactService {
   }
 
   async sendEmail(createContactDto: CreateContactDto) {
+    console.log('--- Tentative d\'envoi d\'email ---');
+    console.log('Host SMTP:', process.env.SMTP_HOST || 'smtp.gmail.com (DÉFAUT)');
+    console.log('User SMTP:', process.env.SMTP_USER || 'NON DÉFINI');
+    
     const { name, email, message } = createContactDto;
 
     const mailOptions = {
