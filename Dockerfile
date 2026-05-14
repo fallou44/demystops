@@ -32,7 +32,7 @@ ENV NODE_ENV=production
 # Copy package files and install production dependencies
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm install --omit=dev && npm install -g tsx typescript && npx prisma generate
+RUN npm install --omit=dev && npm install -g ts-node typescript && npx prisma generate
 
 # Copy the built frontend to Nginx's directory
 COPY --from=builder /app/dist /usr/share/nginx/html

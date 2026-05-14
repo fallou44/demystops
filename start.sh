@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Start the Node.js backend in the background
-# We use tsx because the project is set up to run server.ts directly
-tsx server.ts &
+# We use ts-node-esm because it supports NestJS dependency injection (metadata)
+ts-node-esm server.ts &
 
 # Start Nginx in the foreground
 nginx -g 'daemon off;'
